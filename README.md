@@ -11,3 +11,5 @@ sudo dpkg --remove --force-depends python-numpy
 ## install lastest numpy in user mode
 pip install --user numpy
 or sudo esay_install numpy
+
+    <img src="{{ url_for('video_feed') }}">
