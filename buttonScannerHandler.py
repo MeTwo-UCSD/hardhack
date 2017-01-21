@@ -8,15 +8,15 @@ from gpio_96boards import GPIO
 
 #Pin Declarations
 GPIO_LEFT_MOTOR_FWD = GPIO.gpio_id('GPIO_A') #pin 23
-#GPIO_LEFT_MOTOR_BWD = GPIO.gpio_id('GPIO_B')
-#GPIO_RIGHT_MOTOR_FWD = GPIO.gpio_id('GPIO_C')
-#GPIO_RIGHT_MOTOR_BWD = GPIO.gpio_id('GPIO_D')
+GPIO_LEFT_MOTOR_BWD = GPIO.gpio_id('GPIO_B') #pin 24
+GPIO_RIGHT_MOTOR_FWD = GPIO.gpio_id('GPIO_C') #pin 25
+GPIO_RIGHT_MOTOR_BWD = GPIO.gpio_id('GPIO_D') #pin 26
 
 pins = (
     (GPIO_LEFT_MOTOR_FWD, 'out'),
-    #(GPIO_LEFT_MOTOR_BWD, 'out'),
-    #(GPIO_RIGHT_MOTOR_FWD, 'out'),
-    #(GPIO_RIGHT_MOTOR_BWD, 'out')
+    (GPIO_LEFT_MOTOR_BWD, 'out'),
+    (GPIO_RIGHT_MOTOR_FWD, 'out'),
+    (GPIO_RIGHT_MOTOR_BWD, 'out'),
 )
 
 
@@ -60,31 +60,85 @@ if __name__ == '__main__':
         #While time passed is less than run time
         while (nowTime - startTime < RUN_TIME):  # lastPressed != END):
             nowTime = current_milli_time()
-            # if(lastPressed == PAUSE):
-            # do nothing. Wait for next drive or turn button to be pressed
-            # elif(lastPressed == DRIVE_FORWARD):
-            # PWM for both motors
-            # elif(lastPressed == DRIVE_BACKWARD):
-            # PWM for both motors
-            # elif(lastPressed == TURN_RIGHT):
-            # PWM for left motor
-
-            #If state is high, set pin high. Check if enough time has passed.
-            if (not LOW):
-                gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
-                if (nowTime - lastTime > HIGH_TIME):
-                    lastTime = current_milli_time()
-                    LOW = True
-            #Else, set pin low. Check if enough time has passed. If yes, set state to High.
-            else:
+            if(lastPressed == PAUSE):
                 gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
-                if (nowTime - lastTime > LOW_TIME):
-                    lastTime = current_milli_time()
-                    LOW = False
+                gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.LOW)
+                gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.LOW)
+                gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.LOW)
+                LOW = True
+                lastTime = nowTime
+                # do nothing. Wait for next drive or turn button to be pressed
+            elif(lastPressed == DRIVE_FORWARD):
+                # If state is high, set pins high. Check if enough time has passed.
+                if (not LOW):
+                    gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.HIGH)
+                    if (nowTime - lastTime > HIGH_TIME):
+                        lastTime = current_milli_time()
+                        LOW = True
+                # Else, set pins low. Check if enough time has passed. If yes, set state to High.
+                else:
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.LOW)
+                    if (nowTime - lastTime > LOW_TIME):
+                        lastTime = current_milli_time()
+                        LOW = False
+            elif(lastPressed == DRIVE_BACKWARD):
+                # If state is high, set pins high. Check if enough time has passed.
+                if (not LOW):
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.HIGH)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.HIGH)
+                    if (nowTime - lastTime > HIGH_TIME):
+                        lastTime = current_milli_time()
+                        LOW = True
+                # Else, set pins low. Check if enough time has passed. If yes, set state to High.
+                else:
+                    gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.LOW)
+                    if (nowTime - lastTime > LOW_TIME):
+                        lastTime = current_milli_time()
+                        LOW = False
+            elif(lastPressed == TURN_RIGHT):
+                # PWM for left motor
+                #If state is high, set pin high. Check if enough time has passed.
+                if (not LOW):
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
+                    if (nowTime - lastTime > HIGH_TIME):
+                        lastTime = current_milli_time()
+                        LOW = True
+                #Else, set pin low. Check if enough time has passed. If yes, set state to High.
+                else:
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+                    if (nowTime - lastTime > LOW_TIME):
+                        lastTime = current_milli_time()
+                        LOW = False
 
-                    # elif(lastPressed == TURN_LEFT):
-                    # PWM for right motor
-                    # else:
-                    # stdout error
-                    # lastPressed = request.form['submit'] #update the value of the last pressed button
+            elif(lastPressed == TURN_LEFT):
+                # PWM for right motor
+                # If state is high, set pin high. Check if enough time has passed.
+                if (not LOW):
+                    gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_LEFT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_BWD, GPIO.LOW)
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.HIGH)
+                    if (nowTime - lastTime > HIGH_TIME):
+                        lastTime = current_milli_time()
+                        LOW = True
+                # Else, set pin low. Check if enough time has passed. If yes, set state to High.
+                else:
+                    gpio.digital_write(GPIO_RIGHT_MOTOR_FWD, GPIO.LOW)
+                    if (nowTime - lastTime > LOW_TIME):
+                        lastTime = current_milli_time()
+                        LOW = False
+            else:
+                print("ButtonScannerHandler not in if statement")
+
+            # lastPressed = request.form['submit'] #update the value of the last pressed button
 
