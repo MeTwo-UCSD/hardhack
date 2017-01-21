@@ -43,17 +43,17 @@ while(True): #lastPressed != END):
         # PWM for both motors
     #elif(lastPressed == TURN_RIGHT):
         # PWM for left motor
-        if(not LOW):
-            gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
-            if(nowTime - lastTime > HIGH_TIME):
-                lastTime = current_milli_time()
-                LOW = True
+    if(not LOW):
+        gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
+        if(nowTime - lastTime > HIGH_TIME):
+            lastTime = current_milli_time()
+            LOW = True
 
-        else:
-            gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
-            if(nowTime - lastTime > LOW_TIME):
-                lastTime = current_milli_time()
-                LOW = False
+    else:
+        gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+        if(nowTime - lastTime > LOW_TIME):
+            lastTime = current_milli_time()
+            LOW = False
 
     #elif(lastPressed == TURN_LEFT):
         #PWM for right motor
