@@ -3,7 +3,7 @@ import time
 
 from gpio_96boards import GPIO
 
-#This code is a 1:2 PWM of GPIO_A aka pin 23
+#This code provides PWM for two (Left and Right) motors with forward and backward capability provided by an H bridge
 
 
 #Pin Declarations
@@ -29,7 +29,7 @@ TURN_LEFT = "left"
 END = "end"
 
 #Variable to keep track of the last command
-lastPressed = PAUSE #start not moving
+lastPressed = PAUSE #start not moving ###############################Change this to test different input states
 
 #PWM low and high time constants. Also how long the code should run for
 LOW_TIME = 2 #2 millis off
