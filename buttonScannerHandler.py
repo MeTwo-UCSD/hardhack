@@ -9,9 +9,9 @@ GPIO_RIGHT_MOTOR_BWD = GPIO.gpio_id('GPIO_D')
 
 pins = (
     (GPIO_LEFT_MOTOR_FWD, 'out'),
-    (GPIO_LEFT_MOTOR_BWD, 'out'),
-    (GPIO_RIGHT_MOTOR_FWD, 'out'),
-    (GPIO_RIGHT_MOTOR_BWD, 'out')
+    #(GPIO_LEFT_MOTOR_BWD, 'out'),
+    #(GPIO_RIGHT_MOTOR_FWD, 'out'),
+    #(GPIO_RIGHT_MOTOR_BWD, 'out')
 )
 
 PAUSE = "pause"
@@ -32,6 +32,8 @@ current_milli_time = lambda: int(round(time.time() * 1000))
 
 nowTime = current_milli_time()
 lastTime = nowTime
+
+gpio = GPIO(pins)
 
 while(True): #lastPressed != END):
     nowTime = current_milli_time()
