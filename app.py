@@ -2,24 +2,26 @@ from __future__ import print_function
 import os
 from flask import Flask, render_template, Response, request, jsonify
 from camera import Camera
-from buttonScannerHandler import buttonScannerHandler
-from raven.contrib.flask import Sentry
+#from buttonScannerHandler import buttonScannerHandler
+#from raven.contrib.flask import Sentry
 import time
 import threading
-
+import Queue
 
 frameRateLimit = 20
+commandQueue = Queue.Queue(maxsize=0)
 
 app = Flask(__name__)
-sentry = Sentry(app, dsn='https://b705ec878ec74aae84c1b26a4194b612:6288485481504394a071e8ba726a84a4@sentry.io/131345')
+#sentry = Sentry(app, dsn='https://b705ec878ec74aae84c1b26a4194b612:6288485481504394a071e8ba726a84a4@sentry.io/131345')
 
-LEFT, RIGHT, UP, DOWN, STOP = "left", "right", "up", "down", "stop"
+LEFT, RIGHT, UP, DOWN, PAUSE, STOP = "left", "right", "forward", "backward", "pause", "stop"
 AVAILABLE_COMMANDS = {
     'Left': LEFT,
     'Right': RIGHT,
     'Up': UP,
     'Down': DOWN,
-    'stop': STOP
+		'Pause': PAUSE
+    'Stop': STOP
 }
 
 @app.route('/')
@@ -54,27 +56,31 @@ def gpio():
 	try:
 		lang = request.args.get('command', 0, type=str)
 		lang = lang.lower()
-		if lang == 'left':
-			command_queue.put(lang)
+		if lang == LEFT:
+			commandQueue.put(lang)
 			return jsonify(result='left')
-		elif lang == 'right':
-			command_queue.put(lang)
+		elif lang == RIGHT:
+			commandQueue.put(lang)
 			return jsonify(result='right')
-		elif lang == 'forward':
-			command_queue.put(lang)
+		elif lang == UP:
+			commandQueue.put(lang)
 			return jsonify(result='up')
-		elif lang == 'backward':
-			command_queue.put(lang)
+		elif lang == DOWN:
+			commandQueue.put(lang)
 			return jsonify(result='down')
-		elif lang == 'pause':
-			command_queue.put(lang)
-			return jsonify(result='stop')
+		elif lang == PAUSE:
+			commandQueue.put(lang)
+			return jsonify(result='pause')
 		else:
 			return jsonify(result='Try again.')
 	except Exception as e:
 		return str(e)
 
+def start_server(app):
+		app.run(host=os.getenv('IP', '0.0.0.0'),port=int(os.getenv('PORT', 8080)), threaded=True)
+
 if __name__ == '__main__':
-	t = threading.Thread(target=buttonScannerHandler, args=(command_queue,))
-	t.start()
-	app.run(host=os.getenv('IP', '0.0.0.0'),port=int(os.getenv('PORT', 8080)),debug = True, threaded=True)
+	#t = threading.Thread(target=buttonScannerHandler, args=(commandQueue,))
+	#t.start()
+	server_thread = threading.Thread(target=start_server, args=(app, ))
+	server_thread.start()
