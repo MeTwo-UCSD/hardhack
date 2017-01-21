@@ -3,12 +3,12 @@ import time
 from gpio_96boards import GPIO
 
 GPIO_LEFT_MOTOR_FWD = GPIO.gpio_id('GPIO_A') #pin 23
-GPIO_LEFT_MOTOR_BWD = GPIO.gpio_id('GPIO_B')
-GPIO_RIGHT_MOTOR_FWD = GPIO.gpio_id('GPIO_C')
-GPIO_RIGHT_MOTOR_BWD = GPIO.gpio_id('GPIO_D')
+#GPIO_LEFT_MOTOR_BWD = GPIO.gpio_id('GPIO_B')
+#GPIO_RIGHT_MOTOR_FWD = GPIO.gpio_id('GPIO_C')
+#GPIO_RIGHT_MOTOR_BWD = GPIO.gpio_id('GPIO_D')
 
 pins = (
-    (GPIO_LEFT_MOTOR_FWD, 'out'),
+    (GPIO_LEFT_MOTOR_FWD, 'out')
     #(GPIO_LEFT_MOTOR_BWD, 'out'),
     #(GPIO_RIGHT_MOTOR_FWD, 'out'),
     #(GPIO_RIGHT_MOTOR_BWD, 'out')
