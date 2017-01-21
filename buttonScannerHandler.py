@@ -26,6 +26,7 @@ lastPressed = PAUSE #start not moving
 
 LOW_TIME = 2 #2 millis off
 HIGH_TIME = 1 #1 millis on
+RUN_TIME = 25000 #25 sec
 
 LOW = True #starts low. This becomes true when the PWM is supposed to be in the High state
 
@@ -43,7 +44,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     with GPIO(pins) as gpio:
-        while (nowTime - startTime < 7000):  # lastPressed != END):
+        while (nowTime - startTime < RUN_TIME):  # lastPressed != END):
             nowTime = current_milli_time()
             # if(lastPressed == PAUSE):
             # do nothing. Wait for next drive or turn button to be pressed
@@ -54,13 +55,13 @@ if __name__ == '__main__':
             # elif(lastPressed == TURN_RIGHT):
             # PWM for left motor
             if (not LOW):
-                # gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
+                gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
                 if (nowTime - lastTime > HIGH_TIME):
                     lastTime = current_milli_time()
                     LOW = True
 
             else:
-                # gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+                gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
                 if (nowTime - lastTime > LOW_TIME):
                     lastTime = current_milli_time()
                     LOW = False
