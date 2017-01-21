@@ -30,38 +30,38 @@ LOW = True #starts low. This becomes true when the PWM is supposed to be in the 
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
-nowTime = current_milli_time()
+startTime = current_milli_time()
+nowTime = startTime
 lastTime = nowTime
 
-gpio = GPIO(pins)
+with GPIO(pins) as gpio:
+    while(nowTime - startTime < 7000): #lastPressed != END):
+        nowTime = current_milli_time()
+        #if(lastPressed == PAUSE):
+            # do nothing. Wait for next drive or turn button to be pressed
+        #elif(lastPressed == DRIVE_FORWARD):
+            # PWM for both motors
+        #elif(lastPressed == DRIVE_BACKWARD):
+            # PWM for both motors
+        #elif(lastPressed == TURN_RIGHT):
+            # PWM for left motor
+        if(not LOW):
+            gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
+            if(nowTime - lastTime > HIGH_TIME):
+                lastTime = current_milli_time()
+                LOW = True
 
-while(True): #lastPressed != END):
-    nowTime = current_milli_time()
-    #if(lastPressed == PAUSE):
-        # do nothing. Wait for next drive or turn button to be pressed
-    #elif(lastPressed == DRIVE_FORWARD):
-        # PWM for both motors
-    #elif(lastPressed == DRIVE_BACKWARD):
-        # PWM for both motors
-    #elif(lastPressed == TURN_RIGHT):
-        # PWM for left motor
-    if(not LOW):
-        gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.HIGH)
-        if(nowTime - lastTime > HIGH_TIME):
-            lastTime = current_milli_time()
-            LOW = True
+        else:
+            gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
+            if(nowTime - lastTime > LOW_TIME):
+                lastTime = current_milli_time()
+                LOW = False
 
-    else:
-        gpio.digital_write(GPIO_LEFT_MOTOR_FWD, GPIO.LOW)
-        if(nowTime - lastTime > LOW_TIME):
-            lastTime = current_milli_time()
-            LOW = False
-
-    #elif(lastPressed == TURN_LEFT):
-        #PWM for right motor
-    #else:
-        #stdout error
-    #lastPressed = request.form['submit'] #update the value of the last pressed button
+        #elif(lastPressed == TURN_LEFT):
+            #PWM for right motor
+        #else:
+            #stdout error
+        #lastPressed = request.form['submit'] #update the value of the last pressed button
 
 
 
