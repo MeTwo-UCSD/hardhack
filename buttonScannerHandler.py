@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import time
 
 from gpio_96boards import GPIO
