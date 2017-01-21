@@ -19,14 +19,16 @@ class Camera(threading.Thread):
 			while self.frame is None:
 				time.sleep(0)
 
-	#def frame_gen(self):
-#while under frame rate limit, frae
 	def get_frame(self):
 		current_time = time.time()
 		#if
 		Camera.last_access = time.time()
 		self.initialize()
 		return self.frame
+
+	def __del__(self):
+		cap.release()
+		self.thread = None
 
 	@classmethod
 	def worker(self):
