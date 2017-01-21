@@ -1,9 +1,35 @@
 <html>
   <head>
     <title>Video Streaming Demonstration</title>
-  </head>
-  <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type=text/javascript>
+      $(function() {
+        $('a#process_input').bind('click', function() {
+          $.getJSON('/gpio',
+					{ proglang: "firstbutton"}, 
+					function(data) {$("#result").text(data.result);});
+					return false;
+			  });
+			});
+		</script>
+	</head>
+  
+	<body>
     <h1>Video Streaming Demonstration</h1>
     <img src="{{ url_for('video_feed') }}">
+
+		{% for label, command in commands.items() %}
+    	<button class="command command-{{ command }}" value="{{ command }}">
+        {{ label }}
+    	</button>
+		{% endfor %}
+
+		<form>
+				<input type=text size=5 name=proglang>
+				<a href=# id=process_input><button class='btn btn-default'>Submit+++</button></a>
+			</form>
+
+		<p id=result></p>
+
   </body>
-</html>
+</html>	
