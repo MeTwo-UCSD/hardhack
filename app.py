@@ -2,9 +2,11 @@ from __future__ import print_function
 import os
 from flask import Flask, render_template, Response, request, jsonify
 from camera import Camera
-from buttonScannerHandler import command_queue
+from buttonScannerHandler import buttonScannerHandler
 from raven.contrib.flask import Sentry
 import time
+import threading
+
 
 frameRateLimit = 20
 
@@ -58,13 +60,13 @@ def gpio():
 		elif lang == 'right':
 			command_queue.put(lang)
 			return jsonify(result='right')
-		elif lang == 'up':
+		elif lang == 'forward':
 			command_queue.put(lang)
 			return jsonify(result='up')
-		elif lang == 'down':
+		elif lang == 'backward':
 			command_queue.put(lang)
 			return jsonify(result='down')
-		elif lang == 'stop':
+		elif lang == 'pause':
 			command_queue.put(lang)
 			return jsonify(result='stop')
 		else:
@@ -73,4 +75,6 @@ def gpio():
 		return str(e)
 
 if __name__ == '__main__':
+	t = threading.Thread(target=buttonScannerHandler, args=(command_queue,))
+	t.start()
 	app.run(host=os.getenv('IP', '0.0.0.0'),port=int(os.getenv('PORT', 8080)),debug = True, threaded=True)
