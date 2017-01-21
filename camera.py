@@ -4,7 +4,7 @@ import time
 import io
 import threading
 
-class Camera(object):
+class Camera(threading.Thread):
     thread = None  # background thread that reads frames from camera
     frame = None  # current frame is stored here by background thread
     last_access = 0  # time of last client access to the camera
@@ -45,3 +45,4 @@ class Camera(object):
 		if time.time() - self.last_access > 10:
 			break
 	cap.release()
+	self.thread = None
