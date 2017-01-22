@@ -14,13 +14,13 @@ commandQueue = Queue.Queue(maxsize=0)
 app = Flask(__name__)
 #sentry = Sentry(app, dsn='https://b705ec878ec74aae84c1b26a4194b612:6288485481504394a071e8ba726a84a4@sentry.io/131345')
 
-LEFT, RIGHT, UP, DOWN, PAUSE, STOP = "left", "right", "forward", "backward", "pause", "stop"
+LEFT, RIGHT, FORWARD, BACKWARD, PAUSE, STOP = "left", "right", "forward", "backward", "pause", "stop"
 AVAILABLE_COMMANDS = {
     'Left': LEFT,
     'Right': RIGHT,
-    'Up': UP,
-    'Down': DOWN,
-		'Pause': PAUSE
+    'Forward': FORWARD,
+    'Backward': BACKWARD,
+		'Pause': PAUSE,
     'Stop': STOP
 }
 
@@ -62,15 +62,17 @@ def gpio():
 		elif lang == RIGHT:
 			commandQueue.put(lang)
 			return jsonify(result='right')
-		elif lang == UP:
+		elif lang == FORWARD:
 			commandQueue.put(lang)
-			return jsonify(result='up')
-		elif lang == DOWN:
+			return jsonify(result='forward')
+		elif lang == BACKWARD:
 			commandQueue.put(lang)
-			return jsonify(result='down')
+			return jsonify(result='backward')
 		elif lang == PAUSE:
 			commandQueue.put(lang)
 			return jsonify(result='pause')
+		elif lang == STOP:
+			return jsonify(result='Stop')
 		else:
 			return jsonify(result='Try again.')
 	except Exception as e:
