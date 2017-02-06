@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <title>Video Streaming Demonstration</title>
+
+    <link href="//vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
+    <script src="//vjs.zencdn.net/5.4.6/video.min.js"></script>
+    <script src="http://cdn.dashjs.org/latest/dash.all.min.js"></script>
+    <script src="{{url_for('static', filename='javascript/videojs-dash.min.js')}}"></script>
+</head>
+
+<body>
+    <h1>Video Streaming Demonstration</h1>
+
+
+    <form>
+        {% for label, command in commands.items() %}
+        <a href=# id=process_{{ command }}><button class="btn">{{ label }}</button></a> {% endfor %}
+    </form>
+
+    <p id=result></p>
+
+    <video id=example-video width=600 height=300 class="video-js vjs-default-skin" controls> </video>
+
+    <script>
+        var player = videojs('example-video');
+        player.src({
+            src: "{{url_for('send_live', filename='glass_live_manifest.mpd')}}",
+            type: 'application/dash+xml'
+        });
+        player.play();
+    </script>
+
+</body>
+
+</html>

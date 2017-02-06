@@ -1,34 +1,37 @@
 <html>
-  <head>
+
+<head>
     <title>Video Streaming Demonstration</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-   	{% for label, command in commands.items() %}
-		<script type=text/javascript>
-      $(function() {
-        $('a#process_{{ command }}').bind('click', function() {
-          $.getJSON('/gpio',
-					{ command: "{{ label }}"},
-					function(data) {$("#result").text(data.result);});
-					return false;
-			  });
-			});
-		</script>
-				{% endfor %}
-	</head>
+    {% for label, command in commands.items() %}
+    <script type=text/javascript>
+        $(function() {
+            $('a#process_{{ command }}').bind('click', function() {
+                $.getJSON('/gpio', {
+                        command: "{{ label }}"
+                    },
+                    function(data) {
+                        $("#result").text(data.result);
+                    });
+                return false;
+            });
+        });
+    </script>
+    {% endfor %}
+</head>
 
-	<body>
+<body>
     <h1>Video Streaming Demonstration</h1>
-    <img src="{{ url_for('video_feed') }}">
 
-		<form>
+    <form>
 
-		{% for label, command in commands.items() %}
-    	<a href=# id=process_{{ command }}><button class="btn">{{ label }}</button></a>
-		{% endfor %}
+        {% for label, command in commands.items() %}
+        <a href=# id=process_{{ command }}><button class="btn">{{ label }}</button></a> {% endfor %}
 
-		</form>
+    </form>
 
-		<p id=result></p>
+    <p id=result></p>
 
-    </body>
+</body>
+
 </html>
