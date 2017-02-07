@@ -12,7 +12,7 @@ import os
 import shutil
 import platform
 import shlex
-
+import json
 
 class Camera:
     """
@@ -28,16 +28,16 @@ class Camera:
 
         # include ffmpeg or fall back to avconv
         os.environ["PATH"] += os.pathsep + os.path.abspath('./bin')
-        self.bin_path = shutil.which('ffmpeg')
+        self.ffmpeg_path = shutil.which('ffmpeg')
 
-        if self.bin_path is None:
-            self.bin_path = shutil.which('avconv')
-            if self.bin_path is None:
+        if self.ffmpeg_path is None:
+            self.ffmpeg_path = shutil.which('avconv')
+            if self.ffmpeg_path is None:
                 print("cannot find excutable")
                 sys.exit(1)
 
         # input module based on system
-        self._command = [self.bin_path, '-y']
+        self._command = [self.ffmpeg_path, '-y']
         # if platform.system() == 'Windows':
         #    self._command.extend(['-f', 'dshow'])
 
@@ -79,6 +79,17 @@ class Camera:
                 self._command, stdin=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
             out_bytes = e.output
+
+    def _generate_mpd(self):
+        mpd_command = [self.ffmpeg_path]
+
+        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -i glass_360.hdr"))
+        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -i glass_171.hdr"))
+        mpd_command.extend(shlex.split("-c copy"))
+        mpd_command.extend(shlex.split("-map 0 -map 1" ))
+        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -adaptation_sets \"id=0,streams=0 id=1,streams=1\""))
+        mpd_command.extend(shlex.split("-chunk_start_index 1 -chunk_duration_ms 2000 -time_shift_buffer_depth 7200 -minimum_update_period 7200"))
+        mpd_command.extend(shlex.split("glass_live_manifest.mpd"))
 
     def terminate(self):
         """
