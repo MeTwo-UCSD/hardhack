@@ -3,6 +3,7 @@ use ffmepg to take care of video and audio input
 encode as it runs
 
 require python > 3.3
+by defualt, ffmpeg runs under live folder.
 """
 
 from __future__ import print_function
@@ -18,6 +19,7 @@ class Camera:
     """
     capture video through ffmepg command line
     """
+
 
     def __init__(self):
         # require python > 3.3
@@ -37,59 +39,40 @@ class Camera:
                 sys.exit(1)
 
         # input module based on system
-        self._command = [self.ffmpeg_path, '-y']
+
         # if platform.system() == 'Windows':
         #    self._command.extend(['-f', 'dshow'])
+
+        with open('command.json') as file:
+            self._command = json.load(file)
 
     def run(self):
         # ffmpeg -list_devices true -f dshow -i dummy
         # ffmpeg -f dshow -list_options true -i video="Integrated Camera"
         # ffmpeg -f dshow -video_size 1920x1080 -framerate 30 -pixel_format
         # video4linux2
+        self._generate_live()
+        self._generate_mpd()
+
+
+    def _generate_live(self):
         """
         todo: add configuration and device selection
         """
+        live_command = [self.ffmpeg_path, '-y']
 
-        VP9_LIVE_PARAMS = shlex.split(
-            "-speed 6 -tile-columns 4 -frame-parallel 1 -threads 8 -static-thresh 0 -max-intra-rate 300 -deadline realtime -lag-in-frames 0 -error-resilient 1")
+        live_command.extend(shlex.split(self._command['win']['input_video']))
+        live_command.extend(shlex.split(self._command['generate_live']))
 
-        # input video device
-        self._command.extend(['-f', 'dshow', '-vcodec', 'h264', '-video_size',
-                              '1920x1080', '-framerate', '30', '-i', 'video=HD Pro Webcam C920'])
-        # input audio device
-        self._command.extend(['-f', 'dshow', '-sample_size', '16', '-sample_rate',
-                              '44100', '-channels', '1', '-i', 'audio=Microphone (HD Pro Webcam C920)'])
-        # map input
-        self._command.extend(['-map', '0:0', '-pix_fmt', 'yuv420p',
-                              '-c:v', 'libvpx-vp9', '-s', '1280x720', '-keyint_min', '60', '-g', '60', '-b:v', '3000k'])
-
-        self._command.extend(VP9_LIVE_PARAMS)
-
-        self._command.extend(['-f', 'webm_chunk', '-header', '/live/glass_360.hdr',
-                              '-chunk_start_index', '1', '/live/glass_360_%d.chk'])
-
-        # , '-map', '1:0'])
-        # # output video & audio format
-        # self._command.extend(['-vcodec', 'libx264'])
-        # self._command.extend(['-acodec', 'aac', '-ab', '128k', '-ar', '44100'])
-        # self._command.extend(
-        #     ['-maxrate', '750k', '-bufsize', '4000k', 'out.mp4'])
-        try:
-            self._process = subprocess.Popen(
-                self._command, stdin=subprocess.PIPE)
-        except subprocess.CalledProcessError as e:
-            out_bytes = e.output
+        self._process = subprocess.Popen(live_command, stdin=subprocess.PIPE, cwd='live')
 
     def _generate_mpd(self):
         mpd_command = [self.ffmpeg_path]
 
-        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -i glass_360.hdr"))
-        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -i glass_171.hdr"))
-        mpd_command.extend(shlex.split("-c copy"))
-        mpd_command.extend(shlex.split("-map 0 -map 1" ))
-        mpd_command.extend(shlex.split("-f webm_dash_manifest -live 1 -adaptation_sets \"id=0,streams=0 id=1,streams=1\""))
-        mpd_command.extend(shlex.split("-chunk_start_index 1 -chunk_duration_ms 2000 -time_shift_buffer_depth 7200 -minimum_update_period 7200"))
-        mpd_command.extend(shlex.split("glass_live_manifest.mpd"))
+        mpd_command.extend(shlex.split(self._command['generate_mpd']))
+
+        subprocess.Popen(mpd_command, cwd='live')
+
 
     def terminate(self):
         """
@@ -104,5 +87,5 @@ if __name__ == "__main__":
     test_cam = Camera()
     t = Thread(target=test_cam.run, daemon=True)
     t.start()
-    time.sleep(30)
+    time.sleep(60)
     test_cam.terminate()

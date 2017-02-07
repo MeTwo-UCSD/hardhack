@@ -1,0 +1,8 @@
+{
+    "generate_live": "-map 0:0 -pix_fmt yuv420p -c:v libvpx-vp9 -s 1280x720 -keyint_min 60 -g 60 -b:v 3000k -speed 6 -tile-columns 4 -frame-parallel 1 -threads 8 -static-thresh 0 -max-intra-rate 300 -deadline realtime -lag-in-frames 0 -error-resilient 1 -f webm_chunk -header glass_360.hdr -chunk_start_index 1 glass_360_%d.chk",
+    "generate_mpd": "-y -f webm_dash_manifest -live 1 -i glass_360.hdr -c copy -map 0 -f webm_dash_manifest -live 1 -adaptation_sets \"id=0,streams=0 \" -chunk_start_index 1 -chunk_duration_ms 2000 -time_shift_buffer_depth 7200 -minimum_update_period 7200 glass_live_manifest.mpd",
+    "win": {
+        "input_audio": "-f dshow -sample_size 16 -sample_rate 44100 -channels 1 -i audio=\"Microphone (HD Pro Webcam C920)\"",
+        "input_video": "-f dshow -vcodec h264 -video_size 1920x1080 -framerate 30 -i video=\"HD Pro Webcam C920\""
+    }
+}
