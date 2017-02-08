@@ -6,19 +6,16 @@ from __future__ import print_function
 import os
 from flask import *
 import time
-import threading
 import queue as Queue
-
-from dummy_camera import Camera
-
-#from buttonScannerHandler import buttonScannerHandler
-#from raven.contrib.flask import Sentry
+import threading
+from multiprocessing import Process
+import random
+from camera_ff import Camera
 
 frameRateLimit = 20
 commandQueue = Queue.Queue(maxsize=0)
 
 app = Flask(__name__)
-#sentry = Sentry(app, dsn='https://b705ec878ec74aae84c1b26a4194b612:6288485481504394a071e8ba726a84a4@sentry.io/131345')
 
 LEFT, RIGHT, FORWARD, BACKWARD, PAUSE, STOP = "left", "right", "forward", "backward", "pause", "stop"
 AVAILABLE_COMMANDS = {
@@ -34,21 +31,6 @@ AVAILABLE_COMMANDS = {
 @app.route('/')
 def index():
     return render_template('index2.html', commands=AVAILABLE_COMMANDS)
-
-
-# def gen(camera):
-#     while True:
-#         time.sleep(1 / 10)
-#         frame = camera.get_frame()
-#         yield (b'--frame\r\n'
-#                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
-# @app.route('/video_feed')
-# def video_feed():
-#     return Response(gen(Camera()),
-#                     mimetype='multipart/x-mixed-replace; boundary=frame')
-
 
 def shutdown_server():
     func = request.environ.get('werkzeug.server.shutdown')
@@ -99,7 +81,11 @@ def start_server(app):
         os.getenv('PORT', 8080)), threaded=True)
 
 if __name__ == '__main__':
-    #t = threading.Thread(target=buttonScannerHandler, args=(commandQueue,))
-    # t.start()
+    _hash = random.getrandbits(128)
+    # start live stream in new process so there is no IO
+    live_cam = Camera()
+    live_proc = Process(target=live_cam.run, args=("%032x"%_hash,), daemon=True)
+    live_proc.start()
+    # start server in new thread so that it can end properly?
     server_thread = threading.Thread(target=start_server, args=(app, ))
     server_thread.start()
