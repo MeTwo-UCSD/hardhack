@@ -1,7 +1,14 @@
-# Byte-compiled / optimized / DLL files
+# python Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
+# temporary files
 live/*
+
+# development files
 .vscode/
+.idea/
+
+# deployment files
+deploy.json
